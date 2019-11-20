@@ -30,4 +30,5 @@ router.get("/users/:id", UsersController.show);
 router.put("/users/:id", UsersController.update);
 router.delete("/users/:id", UsersController.destroy);
 
+router.get("/recoveries/passwords", UsersController.resetPassword);
 export default router;

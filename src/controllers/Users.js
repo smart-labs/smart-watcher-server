@@ -1,5 +1,6 @@
 import User from "../models/User";
-
+import generatePassword from "../utils/password";
+import Mail from "../lib/Mail";
 class UsersController {
   static async index(req, res) {
     const result = await User.find();
@@ -29,6 +30,17 @@ class UsersController {
     const result = await User.findByIdAndDelete(req.query.id);
 
     res.send(result);
+  }
+  static async resetPassword(req, res) {
+    const user = await User.findOne({ email: req.params.email });
+    user.password = generatePassword();
+    user.save();
+    await Mail.sendMail({
+      to: `${user.name} <${req.query.email}>`,
+      subject: "Recuperação de senha - Smart labs watcher",
+      text: `${user.name} sua nova senha é - ${user.password}`
+    });
+    return res.send("Email enviado para sua caixa de entrada!");
   }
 }
 
