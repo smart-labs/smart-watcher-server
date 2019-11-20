@@ -4,10 +4,13 @@ import helmet from "helmet";
 import cors from "cors";
 import routes from "./routes";
 import ServerWatcher from "./services/ServerWatcher";
+import io from "socket.io";
+import http from "http";
 
 class Server {
   constructor({ database, port }) {
-    this.server = express();
+    this.app = express();
+    this.server = http.Server(this.app);
     this.port = port;
 
     this.database(database);
@@ -19,18 +22,23 @@ class Server {
     mongoose.connect(url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      useCreateIndex: true
+      useCreateIndex: true,
+      useFindAndModify: false
     });
   }
 
   middlewares() {
-    this.server.use(cors());
-    this.server.use(helmet());
-    this.server.use(express.json())
+    this.app.use((req, res, next) => {
+      req.io = io(this.server);
+      return next();
+    });
+    this.app.use(cors());
+    this.app.use(helmet());
+    this.app.use(express.json());
   }
 
   routes() {
-    this.server.use(routes);
+    this.app.use(routes);
   }
 
   start() {

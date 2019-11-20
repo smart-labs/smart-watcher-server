@@ -15,19 +15,21 @@ class UsersController {
   }
 
   static async show(req, res) {
-    const result = await User.findById(req.query.id);
+    const result = await User.findById(req.params.id);
 
     res.send(result);
   }
 
   static async update(req, res) {
-    const result = await User.findByIdAndUpdate(req.query.id);
+    const result = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true
+    });
 
     res.send(result);
   }
 
   static async destroy(req, res) {
-    const result = await User.findByIdAndDelete(req.query.id);
+    const result = await User.findByIdAndDelete(req.params.id);
 
     res.send(result);
   }
